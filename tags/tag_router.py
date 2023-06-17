@@ -93,28 +93,28 @@ async def create_tag(tag_data: CreateTag):
 
 @router.get("/fetch_all")
 async def get_tags(current_user: User = Depends(service.get_current_user)):
-        try:
-            tags = await db[DATABOARD_COLLECTIONS.TAGS].find(
-                    {"email": current_user["email"]}
-                )
-            if tags is not None:
-                    return {
-                        "status_code": status.HTTP_200_OK,
-                        "status": "success",
-                        "message": "Request was successfull",
-                        "data": jsonable_encoder(tags),
-                    }
-            else:
-                    raise HTTPException(
-                        status_code=status.HTTP_404_NOT_FOUND,
-                        detail={"status": "error", "message": "No tags found for your organization", "data": ""},
-                    )
-        except Exception as e:
-            print(f"The error is here: {str(e)}")
-            raise HTTPException(
+    try:
+        tags_cursor = db[DATABOARD_COLLECTIONS.TAGS].find({"email": current_user["email"]})
+        tags = await tags_cursor.to_list(length=None)  
+
+        if tags:
+            return {
+                "status_code": status.HTTP_200_OK,
+                "status": "success",
+                "message": "Request was successful",
+                "data": jsonable_encoder(tags),
+            }
+        else:
+            return HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail={"status": "error", "message": "Something went wrong", "data": ""},
+                detail={"status": "error", "message": "No tags found for your organization", "data": ""},
             )
+    except Exception as e:
+        print(f"The error is here: {str(e)}")
+        return HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"status": "error", "message": "Something went wrong", "data": ""},
+        )
 
 @router.post("/get_single/{tag_id}")
 async def get_tag(tag_id:str,current_user: User = Depends(service.get_current_user)):
