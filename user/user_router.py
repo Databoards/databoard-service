@@ -12,11 +12,11 @@ router = APIRouter(tags=["User Routes"])
 async def register(user_data: User):
     try:
         user_data = jsonable_encoder(user_data)
-        print("We have reached here bro!")
-        print(f'See user data here: {user_data["email"]}')
-
-        email_exists= await db[DATABOARD_COLLECTIONS.USERS].find_one({"email": user_data["email"]})
         
+        email_exists =  db[DATABOARD_COLLECTIONS.USERS].find_one(
+            {"email": user_data["email"]}
+        )
+        print(f"We have reached here bro!  2{email_exists}")
         if email_exists:
             return HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -26,12 +26,9 @@ async def register(user_data: User):
                     "data": "",
                 },
             )
-        
 
-        # user_data["password"] =  PasswordHasher.get_password_hash(user_data["password"])
-        print(f"We have reached here bro!  2{user_data['password']}")
+        user_data["password"] = await PasswordHasher.get_password_hash(user_data["password"])
 
-        print("We have reached here bro!  3")
 
         new_org = await db[DATABOARD_COLLECTIONS.USERS].insert_one(user_data)
 
@@ -101,3 +98,5 @@ async def verify_otp(otp_info: UserVerification):
                 "data": e.detail,
             },
         )
+
+
