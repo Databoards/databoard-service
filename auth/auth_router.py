@@ -16,19 +16,10 @@ async def login(user_credentials: OAuth2PasswordRequestForm = Depends()):
             user = await db[DATABOARD_COLLECTIONS.USERS].find_one(
                 {"email": user_credentials.username}
             )
-
-            
-
             if user and PasswordHasher().verify_password(
                 user_credentials.password, user["org_password"]
             ):
                 access_token = create_access_token({"id": user["_id"]})
-
-                """Fetch user cards"""
-                tags = await db[DATABOARD_COLLECTIONS.TAGS].find_one(
-                    {"email": user["email"]}
-                )
-                tags = [tags]
                 return {
                     "status_code": status.HTTP_200_OK,
                     "status": "success",
@@ -36,7 +27,7 @@ async def login(user_credentials: OAuth2PasswordRequestForm = Depends()):
                     "data": {
                         "user": user,
                         "access_token": access_token,
-                        "tags": tags,
+                        "data": user,
                     },
                 }
             else:
@@ -49,7 +40,6 @@ async def login(user_credentials: OAuth2PasswordRequestForm = Depends()):
                     },
                 )
     except Exception as e:
-        print(f"This is the error: {e}")
         return HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={

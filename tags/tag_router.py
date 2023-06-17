@@ -95,7 +95,7 @@ async def create_tag(tag_data: CreateTag):
 async def get_tags(current_user: User = Depends(service.get_current_user)):
         try:
             tags = await db[DATABOARD_COLLECTIONS.TAGS].find(
-                    {"_id": current_user["tag_id"]}
+                    {"_id": current_user["email"]}
                 )
             if tags is not None:
                     return {
