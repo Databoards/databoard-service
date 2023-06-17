@@ -13,6 +13,7 @@ async def register(user_data: User):
     try:
         user_data = jsonable_encoder(user_data)
         print("We have reached here bro!")
+        print(f'See user data here: {user_data["email"]}')
         
         email_exists = await  db[DATABOARD_COLLECTIONS.USERS].find_one(
             {"email": user_data["email"]}
