@@ -55,7 +55,7 @@ class User(BaseModel):
                 "email": "sales@databoard.ai",
                 "org_phone": "07061046672",
                 "org_link": "www.databoard.ai",
-                "org_password": "***********",
+                "org_password": "password",
                 "image":"",
                 "verified": False,
             }
