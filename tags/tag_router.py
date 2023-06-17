@@ -94,8 +94,11 @@ async def create_tag(tag_data: CreateTag):
 @router.get("/fetch_all")
 async def get_tags(current_user: User = Depends(service.get_current_user)):
     try:
-        tags_cursor = db[DATABOARD_COLLECTIONS.TAGS].find({"email": current_user["email"]})
-        tags = await tags_cursor.to_list(length=None)  
+        tags_cursor = db[DATABOARD_COLLECTIONS.TAGS].find(
+            {"email": current_user["email"]},
+            projection={"_id": False}  # Exclude the ObjectId field
+        )
+        tags = await tags_cursor.to_list(length=None)  # Convert cursor to list
 
         if tags:
             return {
@@ -116,6 +119,7 @@ async def get_tags(current_user: User = Depends(service.get_current_user)):
             detail={"status": "error", "message": "Something went wrong", "data": ""},
         )
 
+        
 @router.post("/get_single/{tag_id}")
 async def get_tag(tag_id:str,current_user: User = Depends(service.get_current_user)):
         try:
