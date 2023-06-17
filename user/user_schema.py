@@ -30,7 +30,7 @@ class PyObjectId(ObjectId):
 
 class User(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    name:str=Field(...)
+    org_name:str=Field(...)
     org_type: str = Field(...)
     org_location: str = Field(...)
     no_employees: str = Field(...)
@@ -47,7 +47,7 @@ class User(BaseModel):
         json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
-                "name": "Databoard",
+                "org_name": "Databoard",
                 "org_type": "ICT",
                 "org_location": "Jos",
                 "no_employees": "1-4",
