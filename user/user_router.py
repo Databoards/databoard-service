@@ -13,7 +13,7 @@ async def register(user_data: User):
     try:
         user_data = jsonable_encoder(user_data)
         
-        email_exists =  db[DATABOARD_COLLECTIONS.USERS].find_one(
+        email_exists =  await db[DATABOARD_COLLECTIONS.USERS].find_one(
             {"email": user_data["email"]}
         )
         print(f"We have reached here bro!  2{email_exists}")
@@ -27,7 +27,7 @@ async def register(user_data: User):
                 },
             )
 
-        user_data["password"] = await PasswordHasher.get_password_hash(user_data["password"])
+        user_data["org_password"] = await PasswordHasher.get_password_hash(user_data["org_password"])
 
 
         new_org = await db[DATABOARD_COLLECTIONS.USERS].insert_one(user_data)
