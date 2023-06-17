@@ -18,7 +18,7 @@ async def register(user_data: User):
         )
 
         if email_exists:
-            return HTTPException(
+            return  HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail={
                     "status": "error",
