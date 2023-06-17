@@ -13,9 +13,11 @@ async def register(user_data: User):
     try:
         user_data = jsonable_encoder(user_data)
         
-        if email_exists :=  await db[DATABOARD_COLLECTIONS.USERS].find_one(
+        email_exists =  await db[DATABOARD_COLLECTIONS.USERS].find_one(
             {"email": user_data["email"]}
-        ):
+        )
+
+        if email_exists:
             return HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail={
@@ -25,7 +27,7 @@ async def register(user_data: User):
                 },
             )
 
-        user_data["org_password"] = await PasswordHasher.get_password_hash(user_data["org_password"])
+        user_data["org_password"] =  PasswordHasher.get_password_hash(user_data["org_password"])
 
 
         new_org = await db[DATABOARD_COLLECTIONS.USERS].insert_one(user_data)
