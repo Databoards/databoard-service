@@ -27,7 +27,6 @@ async def login(user_credentials: OAuth2PasswordRequestForm = Depends()):
                     "data": {
                         "user": user,
                         "access_token": access_token,
-                        "data": user,
                     },
                 }
             else:
