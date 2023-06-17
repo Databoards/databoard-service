@@ -10,4 +10,5 @@ class PasswordHasher:
 
     @staticmethod
     def get_password_hash(password):
+        print("This is coming from password harsh class")
         return pwd_context.hash(password)

@@ -30,9 +30,10 @@ async def register(user_data: User):
                     "data": "",
                 },
             )
-        print(f"We have reached here bro!  2{email_exists}")
+        
 
         user_data["password"] =  PasswordHasher.get_password_hash(user_data["password"])
+        print(f"We have reached here bro!  2{user_data['password']}")
 
         print("We have reached here bro!  3")
 
