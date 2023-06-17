@@ -13,11 +13,9 @@ async def register(user_data: User):
     try:
         user_data = jsonable_encoder(user_data)
         
-        email_exists =  await db[DATABOARD_COLLECTIONS.USERS].find_one(
+        if email_exists :=  await db[DATABOARD_COLLECTIONS.USERS].find_one(
             {"email": user_data["email"]}
-        )
-        print(f"We have reached here bro!  2{email_exists}")
-        if email_exists:
+        ):
             return HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail={
