@@ -14,11 +14,13 @@ async def register(user_data: User):
         user_data = jsonable_encoder(user_data)
         print("We have reached here bro!")
         print(f'See user data here: {user_data["email"]}')
+
+        email_exists=db[DATABOARD_COLLECTIONS.USERS].find_one({"email": user_data["email"]})
         
-        email_exists = await  db[DATABOARD_COLLECTIONS.USERS].find_one(
-            {"email": user_data["email"]}
-        )
-        print(f"We have reached here bro!  2{email_exists}")
+        # email_exists = await  db[DATABOARD_COLLECTIONS.USERS].find_one(
+        #     {"email": user_data["email"]}
+        # )
+        
         if email_exists:
             return HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -28,6 +30,7 @@ async def register(user_data: User):
                     "data": "",
                 },
             )
+        print(f"We have reached here bro!  2{email_exists}")
 
         user_data["password"] =  PasswordHasher.get_password_hash(user_data["password"])
 
