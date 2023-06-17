@@ -109,7 +109,8 @@ async def get_tags(current_user: User = Depends(service.get_current_user)):
                         status_code=status.HTTP_404_NOT_FOUND,
                         detail={"status": "error", "message": "No tags found for your organization", "data": ""},
                     )
-        except Exception:
+        except Exception as e:
+            print(f"The error is here: {str(e)}")
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail={"status": "error", "message": "Something went wrong", "data": ""},
