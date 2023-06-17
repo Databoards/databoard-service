@@ -21,10 +21,10 @@ async def login(user_credentials: OAuth2PasswordRequestForm = Depends()):
         access_token = create_access_token({"id": user["_id"]})
 
         """Fetch user cards"""
-        card = await db[DATABOARD_COLLECTIONS.TAGS].find_one(
+        tags = await db[DATABOARD_COLLECTIONS.TAGS].find_one(
             {"email": user["email"]}
         )
-        cards = [card]
+        tags = [tags]
         return {
             "status_code": status.HTTP_200_OK,
             "status": "success",
@@ -32,7 +32,7 @@ async def login(user_credentials: OAuth2PasswordRequestForm = Depends()):
             "data": {
                 "user": user,
                 "access_token": access_token,
-                "cards": cards,
+                "tags": tags,
             },
         }
     else:
@@ -57,7 +57,7 @@ async def change_password(
     )
 
     if user and PasswordHasher().verify_password(
-        user_credentials.password, user["pin"]
+        user_credentials.password, user["password"]
     ):
         access_token = create_access_token({"id": user["_id"]})
         return {"access_token": access_token, "token_type": "bearer"}

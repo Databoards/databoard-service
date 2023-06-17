@@ -30,20 +30,33 @@ class PyObjectId(ObjectId):
 
 class User(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    phone_no: str = Field(...)
+    name:str=Field(...)
+    org_type: str = Field(...)
+    org_location: str = Field(...)
+    no_employees: str = Field(...)
+    no_branches: str = Field(...)
     email: EmailStr = Field(...)
+    org_phone: str = Field(...)
+    org_link: str = Field(...)
+    org_password: str = Field(...,min=8)
+    image: str = Field(...)
     verified: bool = Field(default=False)
-    link: str = Field(...)
-
     class Config:
         allowed_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
-                "email": "johndoe@databoard.ai",
-                "phone_no": "07061046672",
-                "link": "www.databoard.ai",
+                "name": "Databoard",
+                "org_type": "ICT",
+                "org_location": "Jos",
+                "no_employees": "1-4",
+                "no_branches": "3",
+                "email": "sales@databoard.ai",
+                "org_phone": "07061046672",
+                "org_link": "www.databoard.ai",
+                "org_password": "***********",
+                "image":"",
                 "verified": False,
             }
         }
@@ -70,6 +83,7 @@ class RegistrationResponse(BaseModel):
 
 class UserProfile(BaseModel):
     name: str
+    email: EmailStr = Field(...)
     org_type: str
     location: str
 
@@ -80,6 +94,7 @@ class UserProfile(BaseModel):
         schema_extra = {
             "example": {
                 "name": "Databoard",
+                "email":"johndoe@databoard.ai",
                 "org_type": "FinTech",
                 "location": "Abuja",
             }
@@ -87,6 +102,7 @@ class UserProfile(BaseModel):
 
 
 class OrganizationInfo(BaseModel):
+    email: EmailStr = Field(...)
     no_employees: str
     no_branches: str
     image: str
@@ -98,7 +114,25 @@ class OrganizationInfo(BaseModel):
         schema_extra = {
             "example": {
                 "no_employees": "34",
+                "email":"johndoe@databoard.ai",
                 "no_branches": "4",
                 "image": "Abuja",
             }
         }
+
+
+class UserVerification(BaseModel):
+    email: EmailStr = Field(...)
+    otp: str = Field(...)
+
+    class Config:
+        allowed_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+        schema_extra = {
+            "example": {
+                "email": "johndoe@databoard.ai",
+                "otp": "123456",
+            }
+        }
+

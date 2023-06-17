@@ -132,6 +132,7 @@ env/include
 env/lib
 env/lib64
 env/
+/venv
 venv/
 ENV/
 env.bak/

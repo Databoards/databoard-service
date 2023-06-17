@@ -3,5 +3,5 @@ from dataclasses import dataclass
 
 @dataclass
 class DATABOARD_COLLECTIONS:
-    USERS: str = "users"
+    USERS: str = "organization"
     TAGS: str = "tags"

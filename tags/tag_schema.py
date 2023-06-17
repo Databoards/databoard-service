@@ -30,13 +30,25 @@ class PyObjectId(ObjectId):
 
 class Tag(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    email: str = Field(...)
-    tag_name: EmailStr = Field(...)
+    email: EmailStr = Field(...)
+    tag_name: str = Field(...)
     start_date: str = Field(...)
-    end_date: EmailStr = Field(...)
+    end_date: str = Field(...)
     start_time: str = Field(...)
-    end_time: EmailStr = Field(...)
-    qr_link: str = Field(...)
+    tag_type: str = Field(...)
+    tag_code: str = Field(...)
+    end_time: str = Field(...)
+    qr: str = Field(...)
+
+
+class CreateTag(BaseModel):
+    email: EmailStr = Field(...)
+    tag_name: str = Field(...)
+    start_date: str = Field(...)
+    tag_type: str = Field(...)
+    end_date: str = Field(...)
+    start_time: str = Field(...)
+    end_time: str = Field(...)
 
     class Config:
         allowed_population_by_field_name = True
@@ -45,15 +57,14 @@ class Tag(BaseModel):
         schema_extra = {
             "example": {
                 "email": "johndoe@databoard.ai",
-                "tag_name": "07061046672",
+                "tag_name": "My wedding",
                 "start_date": "12:02:2023",
                 "start_time": "05:23",
                 "end_date": "12:02:2023",
                 "end_time": "05:23",
-                "qr_link": "www.cloudinary.com",
+                "tag_type": "Infinite",
             }
         }
-
 
 class TagResponse(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")

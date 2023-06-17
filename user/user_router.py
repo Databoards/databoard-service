@@ -3,6 +3,7 @@ from fastapi.encoders import jsonable_encoder
 from .user_schema import *
 from utils.mongo_collections import DATABOARD_COLLECTIONS
 from utils.mongo_connect import db
+from utils.password_util import PasswordHasher
 
 router = APIRouter(tags=["User Routes"])
 
@@ -11,11 +12,14 @@ router = APIRouter(tags=["User Routes"])
 async def register(user_data: User):
     try:
         user_data = jsonable_encoder(user_data)
-        email_exists = await db[DATABOARD_COLLECTIONS.USERS].find_one(
+        print("We have reached here bro!")
+        
+        email_exists =  db[DATABOARD_COLLECTIONS.USERS].find_one(
             {"email": user_data["email"]}
         )
+        print(f"We have reached here bro!  2{email_exists}")
         if email_exists:
-            raise HTTPException(
+            return HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail={
                     "status": "error",
@@ -24,7 +28,21 @@ async def register(user_data: User):
                 },
             )
 
+        user_data["password"] = await PasswordHasher.get_password_hash(user_data["password"])
+
+        print("We have reached here bro!  3")
+
         new_org = await db[DATABOARD_COLLECTIONS.USERS].insert_one(user_data)
+
+        otp = "123456"
+
+        """send otp tp user's phone"""
+        # send_otp(otp, user_info["phone_no"])
+
+        ""
+        add_otp_to_user_account = await db[DATABOARD_COLLECTIONS.USERS].update_one(
+            {"email": user_data["email"]}, {"$set": {"otp": otp}}
+        )
 
         created_org = await db[DATABOARD_COLLECTIONS.USERS].find_one(
             {"_id": new_org.inserted_id}
@@ -36,152 +54,49 @@ async def register(user_data: User):
             "data": created_org,
         }
 
-    except Exception:
+    except Exception :
         return HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={
                 "status": "error",
-                "message": "Opps! Something went wrong",
+                "message": "Opps! something went wrong",
                 "data": "",
             },
         )
 
-
-@router.post("/profile")
-async def register(profile_data: UserProfile):
+@router.post("/verify-account")
+async def verify_otp(otp_info: UserVerification):
     try:
-        profile_data = jsonable_encoder(profile_data)
-        account_exists = await db[DATABOARD_COLLECTIONS.USERS].find_one(
-            {"email": profile_data["email"]}
-        )
-        if account_exists:
-            if len(profile_data) > 1:
-                update_result = await db[DATABOARD_COLLECTIONS.USERS].update_one(
-                    {"email": profile_data["email"]},
-                    {
-                        "$set": {
-                            "name": profile_data["name"],
-                            "org_type": profile_data["org_type"],
-                            "location": profile_data["location"],
-                        }
-                    },
-                )
+        otp_info = jsonable_encoder(otp_info)
 
-                if update_result.matched_count == 1:
-                    updated_profile = await db[
-                        DATABOARD_COLLECTIONS.USERS
-                    ].find_one({"email": profile_data["email"]})
-                    if (updated_profile) is not None:
-                        return {
-                            "status_code": status.HTTP_200_OK,
-                            "status": "success",
-                            "message": "Details added successfully",
-                            "data": updated_profile,
-                        }
-                    else:
-                        raise HTTPException(
-                            status_code=status.HTTP_404_NOT_FOUND,
-                            detail={
-                                "status": "error",
-                                "message": "Could not find this account in the database",
-                                "data": "",
-                            },
-                        )
-                else:
-                    raise HTTPException(
-                        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                        detail={
-                            "status": "error",
-                            "message": "Something went wrong",
-                            "data": "",
-                        },
-                    )
-            else:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail={
-                        "status": "error",
-                        "message": "Something went wrong",
-                        "data": "",
-                    },
-                )
+        user = db[DATABOARD_COLLECTIONS.USERS].find_one(otp_info)
+        if not user:
+            return HTTPException(
+                status_code=400,
+                detail={"status": "Error", "message": "User not found", "data": ""},
+            )
 
-    except Exception:
-        return HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={
-                "status": "error",
-                "message": "Opps! Something went wrong",
-                "data": "",
+        # Update the user's status to "email_verified"
+        db[DATABOARD_COLLECTIONS.USERS].update_one(
+            {
+                "email": otp_info["email"],
             },
+            {"$set": {"status": True}},
         )
 
+        return {
+            "status_code": status.HTTP_200_OK,
+            "status": "success",
+            "message": "Account verification was successful",
+            "data": "",
+        }
 
-@router.post("/info")
-async def register(profile_data: OrganizationInfo):
-    try:
-        profile_data = jsonable_encoder(profile_data)
-        account_exists = await db[DATABOARD_COLLECTIONS.USERS].find_one(
-            {"email": profile_data["email"]}
-        )
-        if account_exists:
-            if len(profile_data) > 1:
-                update_result = await db[DATABOARD_COLLECTIONS.USERS].update_one(
-                    {"email": profile_data["email"]},
-                    {
-                        "$set": {
-                            "no_employees": profile_data["no_employees"],
-                            "no_branches": profile_data["no_branches"],
-                            "image": profile_data["image"],
-                        }
-                    },
-                )
-
-                if update_result.matched_count == 1:
-                    updated_profile = await db[
-                        DATABOARD_COLLECTIONS.USERS
-                    ].find_one({"email": profile_data["email"]})
-                    if (updated_profile) is not None:
-                        return {
-                            "status_code": status.HTTP_200_OK,
-                            "status": "success",
-                            "message": "Details added successfully",
-                            "data": updated_profile,
-                        }
-                    else:
-                        raise HTTPException(
-                            status_code=status.HTTP_404_NOT_FOUND,
-                            detail={
-                                "status": "error",
-                                "message": "Could not find this account in the database",
-                                "data": "",
-                            },
-                        )
-                else:
-                    raise HTTPException(
-                        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                        detail={
-                            "status": "error",
-                            "message": "Something went wrong",
-                            "data": "",
-                        },
-                    )
-            else:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail={
-                        "status": "error",
-                        "message": "Something went wrong",
-                        "data": "",
-                    },
-                )
-
-    except Exception:
+    except Exception as e:
         return HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={
-                "status": "error",
-                "message": "Opps! Something went wrong",
-                "data": "",
+                "status": "Error",
+                "message": "Something went wrong",
+                "data": e.detail,
             },
         )

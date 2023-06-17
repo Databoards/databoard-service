@@ -8,7 +8,7 @@ import requests
 from cryptography.fernet import Fernet
 from dotenv import load_dotenv
 from PIL import Image
-from mongo_connect import db
+from utils.mongo_connect import db
 from utils.mongo_collections import DATABOARD_COLLECTIONS
 
 load_dotenv()
@@ -59,8 +59,8 @@ def decrypt(encrypted_combined_bytes):
     return decrypted_combined_bytes
 
 
-def prepare_qr(email: str, tag_type: str):
-    combined_string = QR_SEPARATOR.join([email, tag_type])
+def prepare_qr(email: str, tag_code: str):
+    combined_string = QR_SEPARATOR.join([email, tag_code])
 
     salted_bytes = salt_string(combined_string)
 
@@ -74,9 +74,9 @@ def undress_qr_string(encrypted_bytes):
 
     unsalted_string = unsalt_string(decrypted_bytes)
 
-    email, tag_type = split_decrypted_string(unsalted_string)
+    email, tag_code = split_decrypted_string(unsalted_string)
 
-    return {"clocker_id": email, "card_type": tag_type}
+    return {"clocker_id": email, "card_type": tag_code}
 
 
 def upload_to_cloudinary(image_data: bytes) -> str:
@@ -94,8 +94,8 @@ def upload_to_cloudinary(image_data: bytes) -> str:
 
 def destroy_from_cloudinary(pic_type: str, url: str) -> str:
     folder = ""
-    if pic_type == "card":
-        folder = "clocker/cards/"
+    if pic_type == "tag":
+        folder = "databoard/tags/"
     else:
         folder = "clocker/dp/"
     public_id = url.split("/")[-1].split(".")[0]
@@ -123,11 +123,11 @@ async def qr_logo_url():
     return "https://res.cloudinary.com/dnp0rvouv/image/upload/v1686406100/databoard/logo/databoard_bqxbou.png"
 
 
-def generate_qr(email: str, tag_type: str):
-    qr_string = prepare_qr(email, tag_type).decode()
+def generate_qr(email: str, tag_code: str):
+    qr_string = prepare_qr(email, tag_code).decode()
 
     # logo = Image.open(f'/usr/src/app/img/{qr_logo(card_type=card_type)}')
-    logo = Image.open(requests.get(qr_logo_url(), stream=True).raw)
+    logo = Image.open(requests.get("https://res.cloudinary.com/dnp0rvouv/image/upload/v1686406100/databoard/logo/databoard_bqxbou.png", stream=True).raw)
     # taking base width
     basewidth = 100
 
