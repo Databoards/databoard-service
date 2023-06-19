@@ -13,7 +13,7 @@ router = APIRouter(tags=["Tag Routes"],prefix="/tags")
 
 
 @router.post("/create")
-async def create_tag(tag_data: CreateTag):
+async def create_tag(tag_data: CreateTag,current_user: User = Depends(service.get_current_user)):
     try:
         tag_data = jsonable_encoder(tag_data)
         new_tag_code = str(uuid.uuid4())
