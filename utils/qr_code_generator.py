@@ -75,7 +75,7 @@ def undress_qr_string(encrypted_bytes):
 
     email, tag_code, variant = split_decrypted_string(unsalted_string)
 
-    return {"clocker_id": email, "card_type": tag_code, "variant": variant}
+    return {"email": email, "tag_code": tag_code, "variant": variant}
 
 
 def upload_to_cloudinary(image_data: bytes) -> str:
