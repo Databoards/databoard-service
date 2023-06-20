@@ -1,5 +1,6 @@
 import io
 import os
+
 import cloudinary
 import cloudinary.api
 import cloudinary.uploader
@@ -8,8 +9,6 @@ import requests
 from cryptography.fernet import Fernet
 from dotenv import load_dotenv
 from PIL import Image
-from utils.mongo_connect import db
-from utils.mongo_collections import DATABOARD_COLLECTIONS
 
 load_dotenv()
 
@@ -59,7 +58,7 @@ def decrypt(encrypted_combined_bytes):
     return decrypted_combined_bytes
 
 
-def prepare_qr(email: str, tag_code: str):
+def prepare_qr(email: str, tag_code: str, variant: str):
     combined_string = QR_SEPARATOR.join([email, tag_code])
 
     salted_bytes = salt_string(combined_string)
@@ -74,9 +73,9 @@ def undress_qr_string(encrypted_bytes):
 
     unsalted_string = unsalt_string(decrypted_bytes)
 
-    email, tag_code = split_decrypted_string(unsalted_string)
+    email, tag_code, variant = split_decrypted_string(unsalted_string)
 
-    return {"clocker_id": email, "card_type": tag_code}
+    return {"clocker_id": email, "card_type": tag_code, "variant": variant}
 
 
 def upload_to_cloudinary(image_data: bytes) -> str:
@@ -85,7 +84,6 @@ def upload_to_cloudinary(image_data: bytes) -> str:
         api_key=CLOUDINARY_API_KEY,
         api_secret=CLOUDINARY_SECRET,
     )
-    print("Working on the images")
     response = cloudinary.uploader.upload(
         file=image_data, folder="clocker/cards/", overwrite=True, resource_type="image"
     )
@@ -97,7 +95,8 @@ def destroy_from_cloudinary(pic_type: str, url: str) -> str:
     if pic_type == "tag":
         folder = "databoard/tags/"
     else:
-        folder = "clocker/dp/"
+        folder = "databoard/dp/"
+
     public_id = url.split("/")[-1].split(".")[0]
     cloudinary.config(
         cloud_name=CLOUDINARY_CLOUD_NAME,
@@ -105,9 +104,7 @@ def destroy_from_cloudinary(pic_type: str, url: str) -> str:
         api_secret=CLOUDINARY_SECRET,
     )
 
-    print("Working on the images")
     response = cloudinary.uploader.destroy(folder + public_id)
-    print(response)
     return response
 
 
@@ -123,11 +120,16 @@ async def qr_logo_url():
     return "https://res.cloudinary.com/dnp0rvouv/image/upload/v1686406100/databoard/logo/databoard_bqxbou.png"
 
 
-def generate_qr(email: str, tag_code: str):
-    qr_string = prepare_qr(email, tag_code).decode()
+def generate_qr(email: str, tag_code: str, variant: str):
+    qr_string = prepare_qr(email, tag_code, variant).decode()
 
     # logo = Image.open(f'/usr/src/app/img/{qr_logo(card_type=card_type)}')
-    logo = Image.open(requests.get("https://res.cloudinary.com/dnp0rvouv/image/upload/v1686406100/databoard/logo/databoard_bqxbou.png", stream=True).raw)
+    logo = Image.open(
+        requests.get(
+            "https://res.cloudinary.com/dnp0rvouv/image/upload/v1686406100/databoard/logo/databoard_bqxbou.png",
+            stream=True,
+        ).raw
+    )
     # taking base width
     basewidth = 100
 

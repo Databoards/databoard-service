@@ -1,11 +1,5 @@
-import os
-
-import motor.motor_asyncio
 from bson import ObjectId
-from dotenv import load_dotenv
-from pydantic import BaseModel, BaseSettings, EmailStr, Field
-
-
+from pydantic import BaseModel, EmailStr, Field
 
 
 class PyObjectId(ObjectId):
@@ -66,6 +60,7 @@ class CreateTag(BaseModel):
             }
         }
 
+
 class TagResponse(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     phone: str = Field(...)
@@ -86,6 +81,3 @@ class TagResponse(BaseModel):
                 "qr_link": "www.cloudinary.com",
             }
         }
-
-
-
