@@ -85,7 +85,7 @@ def upload_to_cloudinary(image_data: bytes) -> str:
         api_secret=CLOUDINARY_SECRET,
     )
     response = cloudinary.uploader.upload(
-        file=image_data, folder="clocker/cards/", overwrite=True, resource_type="image"
+        file=image_data, folder="databoard/tags/", overwrite=True, resource_type="image"
     )
     return response["secure_url"]
 
