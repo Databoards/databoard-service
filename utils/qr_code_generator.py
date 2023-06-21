@@ -59,7 +59,7 @@ def decrypt(encrypted_combined_bytes):
 
 
 def prepare_qr(email: str, tag_code: str, variant: str):
-    combined_string = QR_SEPARATOR.join([email, tag_code])
+    combined_string = QR_SEPARATOR.join([email, tag_code,variant])
 
     salted_bytes = salt_string(combined_string)
 
