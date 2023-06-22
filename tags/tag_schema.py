@@ -51,7 +51,6 @@ class CreateTag(BaseModel):
         json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
-                "org_id": "3456778885332113",
                 "tag_name": "My wedding",
                 "start_date": "12:02:2023",
                 "start_time": "05:23",
