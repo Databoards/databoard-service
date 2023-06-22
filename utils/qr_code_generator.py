@@ -58,8 +58,8 @@ def decrypt(encrypted_combined_bytes):
     return decrypted_combined_bytes
 
 
-def prepare_qr(email: str, tag_code: str, variant: str):
-    combined_string = QR_SEPARATOR.join([email, tag_code,variant])
+def prepare_qr(org_id: str, tag_code: str, variant: str):
+    combined_string = QR_SEPARATOR.join([org_id, tag_code,variant])
 
     salted_bytes = salt_string(combined_string)
 
@@ -73,9 +73,9 @@ def undress_qr_string(encrypted_bytes):
 
     unsalted_string = unsalt_string(decrypted_bytes)
 
-    email, tag_code, variant = split_decrypted_string(unsalted_string)
+    org_id, tag_code, variant = split_decrypted_string(unsalted_string)
 
-    return {"email": email, "tag_code": tag_code, "variant": variant}
+    return {"org_id": org_id, "tag_code": tag_code, "variant": variant}
 
 
 def upload_to_cloudinary(image_data: bytes) -> str:
@@ -120,8 +120,8 @@ async def qr_logo_url():
     return "https://res.cloudinary.com/dnp0rvouv/image/upload/v1686406100/databoard/logo/databoard_bqxbou.png"
 
 
-def generate_qr(email: str, tag_code: str, variant: str):
-    qr_string = prepare_qr(email, tag_code, variant).decode()
+def generate_qr(org_id: str, tag_code: str, variant: str):
+    qr_string = prepare_qr(org_id, tag_code, variant).decode()
 
     # logo = Image.open(f'/usr/src/app/img/{qr_logo(card_type=card_type)}')
     logo = Image.open(
@@ -172,6 +172,6 @@ def generate_qr(email: str, tag_code: str, variant: str):
         folder="databoard/tags/",
         overwrite=True,
         resource_type="image",
-        puplic_id=email,
+        puplic_id=org_id,
     )
     return response["secure_url"]

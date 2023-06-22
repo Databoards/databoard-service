@@ -23,22 +23,24 @@ async def create_tag(
         new_tag_code = str(uuid.uuid4())
 
         tag = Tag(
-            email=tag_data.get("email"),
+            org_id=tag_data.get("_id"),
+            org_name=current_user.get("org_name"),
             tag_name=tag_data.get("tag_name"),
             tag_type=tag_data.get("tag_type"),
+            tag_code=new_tag_code,
+            image="https://picsum.photos/640/360",
+            qr=generate_qr(
+                email=tag_data.get("email"), tag_code=new_tag_code, variant="databoard"
+            ),
             start_date=tag_data.get("start_date"),
             end_date=tag_data.get("end_date"),
             start_time=tag_data.get("start_time"),
             end_time=tag_data.get("end_time"),
-            tag_code=new_tag_code,
-            qr=generate_qr(
-                email=tag_data.get("email"), tag_code=new_tag_code, variant="databoard"
-            ),
         )
 
         tag_exists = await db[DATABOARD_COLLECTIONS.TAGS].find_one(
             {
-                "email": tag_data["email"],
+                "torg_id": current_user.get("_id"),
                 "tag_name": tag_data.get("tag_name"),
             }
         )
@@ -164,7 +166,7 @@ async def get_tag(tag_id: str, current_user: User = Depends(service.get_current_
 async def get_tag(tag_id: str, current_user: User = Depends(service.get_current_user)):
     try:
         result = await db[DATABOARD_COLLECTIONS.TAGS].delete_one(
-            {"email": current_user["email"], "_id": {tag_id}}
+            {"org_id": current_user["_id"], "_id": {tag_id}}
         )
         if result.deleted_count == 1:
             return {

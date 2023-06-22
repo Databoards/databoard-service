@@ -24,19 +24,21 @@ class PyObjectId(ObjectId):
 
 class Tag(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    email: EmailStr = Field(...)
+    org_id: str = Field(...)
+    org_name: str = Field(...)
     tag_name: str = Field(...)
+    tag_type: str = Field(...)
+    tag_code: str = Field(...)
+    image: str = Field(...)
+    qr: str = Field(...)
     start_date: str = Field(...)
     end_date: str = Field(...)
     start_time: str = Field(...)
-    tag_type: str = Field(...)
-    tag_code: str = Field(...)
     end_time: str = Field(...)
-    qr: str = Field(...)
 
 
 class CreateTag(BaseModel):
-    email: EmailStr = Field(...)
+    org_id: EmailStr = Field(...)
     tag_name: str = Field(...)
     start_date: str = Field(...)
     tag_type: str = Field(...)
@@ -50,7 +52,7 @@ class CreateTag(BaseModel):
         json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
-                "email": "johndoe@databoard.ai",
+                "org_id": "3456778885332113",
                 "tag_name": "My wedding",
                 "start_date": "12:02:2023",
                 "start_time": "05:23",
