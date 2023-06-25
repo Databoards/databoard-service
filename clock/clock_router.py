@@ -14,7 +14,7 @@ router = APIRouter(tags=["Clock Routes"], prefix="/clocks")
 
 @router.get("/fetch_tag_clocks/{tag_id}")
 async def fetch_tag_clocks(
-    current_user: User = Depends(service.get_current_user)
+    tag_id:str,current_user: User = Depends(service.get_current_user)
 ):
     try:
         clocks=db[DATABOARD_COLLECTIONS.TAGS].find_one({"org_id":current_user.get("_id"),"_id": ObjectId({tag_id})},projection={"clocks":True})
