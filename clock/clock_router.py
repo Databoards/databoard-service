@@ -16,7 +16,7 @@ async def fetch_tag_clocks(tag_id: str, current_user: User = Depends(service.get
     try:
         tag_id_str = str(tag_id)  # Convert tag_id to a string
 
-        clocks = await db[DATABOARD_COLLECTIONS.TAGS].find_one({"org_id": current_user.get("_id"), "_id": tag_id_str}, projection={"clocks": True})
+        clocks = await db[DATABOARD_COLLECTIONS.TAGS].find_one({"org_id": current_user.get("_id"), "tag_code": tag_id_str}, projection={"clocks": True})
         if clocks:
             user_ids = [clock.get("user_id") for clock in clocks]
             users = await db[CLOCKER_COLLECTIONS.USERS].find({"_id": {"$in": user_ids}}).to_list(length=None)
