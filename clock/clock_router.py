@@ -14,7 +14,9 @@ router = APIRouter(tags=["Clock Routes"], prefix="/clocks")
 @router.get("/fetch_tag_clocks/{tag_id}")
 async def fetch_tag_clocks(tag_id: str, current_user: User = Depends(service.get_current_user)):
     try:
-        clocks = db[DATABOARD_COLLECTIONS.TAGS].find_one({"org_id": current_user.get("_id"), "_id": tag_id}, projection={"clocks": True})
+        tag_id_str = str(tag_id)  # Convert tag_id to a string
+
+        clocks = db[DATABOARD_COLLECTIONS.TAGS].find_one({"org_id": current_user.get("_id"), "_id": tag_id_str}, projection={"clocks": True})
         if clocks:
             user_ids = [clock.get("user_id") for clock in clocks]
             users = await db[CLOCKER_COLLECTIONS.USERS].find({"_id": {"$in": user_ids}}).to_list(length=None)
@@ -27,7 +29,7 @@ async def fetch_tag_clocks(tag_id: str, current_user: User = Depends(service.get
                 user_info = user_map.get(user_id)
                 if user_info:
                     clock.update({
-                        "tag_id": tag_id,
+                        "tag_id": tag_id_str,
                         "email": user_info.get("email"),
                         "gender": user_info.get("gender"),
                         "age": user_info.get("age")
