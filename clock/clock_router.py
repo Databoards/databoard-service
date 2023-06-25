@@ -34,7 +34,8 @@ async def fetch_tag_clocks(tag_id: str, current_user: User = Depends(service.get
                         "tag_id": tag_id_str,
                         "email": user_info.get("email"),
                         "gender": user_info.get("gender"),
-                        "age": user_info.get("age")
+                        "age": user_info.get("age"),
+                        "rating":5
                     })
 
                 clocks_with_users.append(clock)
