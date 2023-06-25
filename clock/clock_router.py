@@ -15,13 +15,16 @@ router = APIRouter(tags=["Clock Routes"], prefix="/clocks")
 async def fetch_tag_clocks(tag_id: str, current_user: User = Depends(service.get_current_user)):
     try:
         tag_id_str = str(tag_id)  # Convert tag_id to a string
+        print(f"This is the tag_id bro {tag_id_str}")
 
         clocks = await db[DATABOARD_COLLECTIONS.TAGS].find_one({"org_id": current_user.get("_id"), "tag_code": tag_id_str}, projection={"clocks": True})
+        print("This is a pass bro: 1")
         if clocks:
             user_ids = [clock.get("user_id") for clock in clocks]
             users = await db[CLOCKER_COLLECTIONS.USERS].find({"_id": {"$in": user_ids}}).to_list(length=None)
 
             user_map = {str(user["_id"]): user for user in users}
+            print("This is a pass bro: 2")
 
             clocks_with_users = []
             for clock in clocks:
@@ -42,6 +45,7 @@ async def fetch_tag_clocks(tag_id: str, current_user: User = Depends(service.get
                 "message": "Clocks successfully retrieved.",
                 "data": clocks_with_users,
             }
+            print("My brother you need to see this")
         else:
             return {
                 "status_code": status.HTTP_200_OK,
