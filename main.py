@@ -6,6 +6,7 @@ from fastapi.responses import JSONResponse
 from auth import auth_router
 from tags import tag_router
 from user import user_router
+from clock import clock_router
 
 app = FastAPI(timeout=60)
 app.add_middleware(
@@ -35,3 +36,4 @@ async def validation_exception_handler(request, exc):
 app.include_router(user_router.router)
 app.include_router(auth_router.router)
 app.include_router(tag_router.router)
+app.include_router(clock_router.router)
