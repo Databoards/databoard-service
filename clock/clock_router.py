@@ -1,7 +1,7 @@
 import uuid
 from bson import ObjectId
 from fastapi import APIRouter, Depends, HTTPException, status
-
+from datetime import datetime 
 from oauth import service
 from user.user_schema import User
 from utils.mongo_collections import DATABOARD_COLLECTIONS,CLOCKER_COLLECTIONS
@@ -19,7 +19,6 @@ async def fetch_tag_clocks(tag_id: str, current_user: User = Depends(service.get
         clocks = await db[DATABOARD_COLLECTIONS.TAGS].find_one({"org_id": current_user.get("_id"), "tag_code": tag_id_str}, projection={"clocks": True})
         print(f"These are the first clocks bro: {clocks}")
         clocks=clocks.get('clocks')
-        print(f"These are the clocks bro: {clocks}")
         if clocks:
             user_ids = [clock.get("user_id") for clock in clocks]
             users = await db[CLOCKER_COLLECTIONS.USERS].find({"_id": {"$in": user_ids}}).to_list(length=None)
@@ -29,15 +28,21 @@ async def fetch_tag_clocks(tag_id: str, current_user: User = Depends(service.get
 
             clocks_with_users = []
             for clock in clocks:
+                timestamp = datetime.fromisoformat(clock.get('time'))
+                time = timestamp.time().strftime('%H:%M:%S')
+                date = timestamp.date()
                 user_id = clock.get("user_id")
                 user_info = user_map.get(user_id)
                 if user_info:
                     clock.update({
                         "tag_id": tag_id_str,
                         "email": user_info.get("email"),
-                        "name": f'{user_info.get("first_name")} {user_info.get("last_name")}',
+                        "fname": user_info.get("first_name"),
+                        "lname": user_info.get("last_name"),
                         "gender": user_info.get("gender"),
                         "age": user_info.get("age"),
+                        "time":time,
+                        "date":date,
                         "rating":5,
                     })
 
