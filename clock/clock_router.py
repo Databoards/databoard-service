@@ -1,7 +1,7 @@
 import uuid
 from bson import ObjectId
 from fastapi import APIRouter, Depends, HTTPException, status
-from datetime import datetime 
+from datetime import datetime,date
 from oauth import service
 from user.user_schema import User
 from utils.mongo_collections import DATABOARD_COLLECTIONS,CLOCKER_COLLECTIONS
@@ -17,12 +17,10 @@ async def fetch_tag_clocks(tag_id: str, current_user: User = Depends(service.get
         tag_id_str = str(tag_id)  # Convert tag_id to a string
 
         clocks = await db[DATABOARD_COLLECTIONS.TAGS].find_one({"org_id": current_user.get("_id"), "tag_code": tag_id_str}, projection={"clocks": True})
-        print(f"These are the first clocks bro: {clocks}")
         clocks=clocks.get('clocks')
         if clocks:
             user_ids = [clock.get("user_id") for clock in clocks]
             users = await db[CLOCKER_COLLECTIONS.USERS].find({"_id": {"$in": user_ids}}).to_list(length=None)
-            print(f"These are the number of users: {users}")
 
             user_map = {str(user["_id"]): user for user in users}
 
@@ -33,6 +31,8 @@ async def fetch_tag_clocks(tag_id: str, current_user: User = Depends(service.get
                 date = timestamp.date()
                 user_id = clock.get("user_id")
                 user_info = user_map.get(user_id)
+                dob=datetime.strptime(user_info.get("dob"), "%Y-%m-%d %H:%M:%S.%f").date()
+                today = date.today()
                 if user_info:
                     clock.update({
                         "tag_id": tag_id_str,
@@ -41,13 +41,13 @@ async def fetch_tag_clocks(tag_id: str, current_user: User = Depends(service.get
                         "lname": user_info.get("last_name"),
                         "gender": user_info.get("gender"),
                         "age": user_info.get("age"),
+                        "dob":today.year - dob.year,
                         "time":time,
                         "date":date,
                         "rating":5,
                     })
 
                 clocks_with_users.append(clock)
-            print(f"These are the clocks bro: {clocks}")
             return {
                 "status_code": status.HTTP_200_OK,
                 "status": "success",
