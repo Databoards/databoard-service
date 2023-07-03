@@ -1,0 +1,16 @@
+# Ignore version control files
+.git
+.gitignore
+
+# Ignore development and editor files
+.vscode
+*.pyc
+*.swp
+
+# Ignore local dependencies or virtual environments
+venv
+env
+
+# Ignore logs and temporary files
+*.log
+*.tmp

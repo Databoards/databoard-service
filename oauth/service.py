@@ -1,12 +1,14 @@
 import os
 from datetime import datetime, timedelta
 from typing import Dict
+
+import motor.motor_asyncio
 from dotenv import load_dotenv
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from pydantic import BaseModel
-import motor.motor_asyncio
+
 from utils.mongo_collections import DATABOARD_COLLECTIONS
 
 load_dotenv()
@@ -20,8 +22,10 @@ db = client.clocker
 
 oauth_schema = OAuth2PasswordBearer(tokenUrl="token")
 
+
 class TokenData(BaseModel):
     id: str
+
 
 def create_access_token(payload: Dict):
     to_encode = payload.copy()

@@ -1,11 +1,5 @@
-import os
-
-import motor.motor_asyncio
 from bson import ObjectId
-from dotenv import load_dotenv
 from pydantic import BaseModel, EmailStr, Field
-
-
 
 
 class PyObjectId(ObjectId):
@@ -30,7 +24,7 @@ class PyObjectId(ObjectId):
 
 class User(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    org_name:str=Field(...)
+    org_name: str = Field(...)
     org_type: str = Field(...)
     org_location: str = Field(...)
     no_employees: str = Field(...)
@@ -38,9 +32,10 @@ class User(BaseModel):
     email: EmailStr = Field(...)
     org_phone: str = Field(...)
     org_link: str = Field(...)
-    org_password: str = Field(...,min=8)
+    org_password: str = Field(..., min=8)
     image: str = Field(...)
     verified: bool = Field(default=False)
+
     class Config:
         allowed_population_by_field_name = True
         arbitrary_types_allowed = True
@@ -56,7 +51,7 @@ class User(BaseModel):
                 "org_phone": "07061046672",
                 "org_link": "www.databoard.ai",
                 "org_password": "password",
-                "image":"",
+                "image": "",
                 "verified": False,
             }
         }
@@ -94,7 +89,7 @@ class UserProfile(BaseModel):
         schema_extra = {
             "example": {
                 "name": "Databoard",
-                "email":"johndoe@databoard.ai",
+                "email": "johndoe@databoard.ai",
                 "org_type": "FinTech",
                 "location": "Abuja",
             }
@@ -114,7 +109,7 @@ class OrganizationInfo(BaseModel):
         schema_extra = {
             "example": {
                 "no_employees": "34",
-                "email":"johndoe@databoard.ai",
+                "email": "johndoe@databoard.ai",
                 "no_branches": "4",
                 "image": "Abuja",
             }
@@ -135,4 +130,3 @@ class UserVerification(BaseModel):
                 "otp": "123456",
             }
         }
-
