@@ -1,0 +1,23 @@
+name: Build Linux Container Image and Push to ACR
+
+on:
+  push:
+    branches: [ "dev" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: .
+    steps:
+    - uses: actions/checkout@v2
+    - uses: azure/docker-login@v1
+      with:
+        login-server: databoardweb.azurecr.io
+        username: ${{ secrets.AZURE_CONTAINER_REGISTRY_USERNAME }}
+        password: ${{ secrets.AZURE_CONTAINER_REGISTRY_PASSWORD }}
+    - run: |
+        docker build . -t databoardweb.azurecr.io/databoardbackend:${{ github.sha }}
+        docker push databoardweb.azurecr.io/databoardbackend:${{ github.sha }}
