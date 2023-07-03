@@ -5,7 +5,6 @@
 # Ignore development and editor files
 .vscode
 *.pyc
-*.swp
 
 # Ignore local dependencies or virtual environments
 venv
